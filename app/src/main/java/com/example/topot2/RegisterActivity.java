@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.topot2.databinding.ActivityRegisterBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -20,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -29,12 +31,14 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     FirebaseAuth mAuth;
+    ActivityRegisterBinding binding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_register);
+        binding = ActivityRegisterBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         nameInp = findViewById(R.id.reg_name);
         phoneInp = findViewById(R.id.reg_phone);
@@ -59,76 +63,82 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                String email = emailInp.getText().toString().trim();
-                String password = passwdinp.getText().toString().trim();
-
-                if(email != null && password != null) startRegister(email,password);
+                if(validateInputs()){
+                    startRegister();
+                }
                 else Toast.makeText(RegisterActivity.this, "Invalid Input", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
 
-    void startRegister(String email,String password) {
+    void startRegister() {
 
+        showLoading();
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(RegisterActivity.this, "Successfully registered", Toast.LENGTH_SHORT).show();
-
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            addUserToDb(user.getUid());
-
-
+                            addUserToDb(mAuth.getUid());
                         } else {
-                            Toast.makeText(RegisterActivity.this, "Authentication failed.",
+                            hideLoading();
+                            Toast.makeText(RegisterActivity.this, task.getException().getMessage(),
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
 
-    void showProgress(Boolean value) {
+
+    String name,phone,email,password;
+    Boolean validateInputs(){
+
+        name = nameInp.getText().toString();
+        phone = phoneInp.getText().toString();
+        email = emailInp.getText().toString().trim();
+        password = passwdinp.getText().toString().trim();
+
+        if(name != null && phone != null && email != null && password != null)
+            return true;
+        return false;
 
     }
 
 
+    FirebaseFirestore db;
     void addUserToDb(String uId) {
 
-        String name = nameInp.getText().toString();
-        String phone = phoneInp.getText().toString();
-        String email = emailInp.getText().toString().trim();
-        String password = passwdinp.getText().toString().trim();
+        User user = new User(uId,name,phone,email,password);
 
-        User user = new User(name,phone,email,password);
+        db = FirebaseFirestore.getInstance();
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference().getRoot();
+        db.collection("Users")
+                .document(uId)
+                .set(user)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        hideLoading();
+                        if(task.isSuccessful()){
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
+                                    finish();
+                                }
+                            },1000);
 
-
-
-        myRef.child("Users").child(uId).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-
-                if(task.isSuccessful()){
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
-                            finish();
+                        } else {
+                            Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
-                    },1000);
-
-                } else {
-                    Toast.makeText(RegisterActivity.this, "Failed to create user", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+                    }
+                });
 
 
     }
+
+    void showLoading() { binding.progress.setVisibility(View.VISIBLE);}
+    void hideLoading() { binding.progress.setVisibility(View.GONE);}
 
 }

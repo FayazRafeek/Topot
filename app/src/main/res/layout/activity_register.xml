@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Register"
+                android:text="Get Started"
 
                 android:textColor="@color/black"
                 android:textSize="22sp"
@@ -54,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Name"
 
-                    android:inputType="textEmailAddress" />
+                    android:inputType="text" />
 
                 <EditText
                     android:id="@+id/reg_phone"
@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:hint="Phone"
-                    android:inputType="textPassword" />
+                    android:inputType="phone" />
 
                 <EditText
                     android:id="@+id/reg_email"
@@ -70,7 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:hint="email"
-                    android:inputType="textPassword" />
+                    android:inputType="textEmailAddress" />
 
                 <EditText
                     android:id="@+id/reg_password"
@@ -82,28 +82,71 @@
 
                 <Button
                     android:id="@+id/register_btn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="20dp"
-                    android:text="Login" />
+                    android:paddingVertical="12dp"
+                    android:text="Register" />
 
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    android:weightSum="5">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="2dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="2"
+                        android:background="@color/black" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="1"
+                        android:text="OR"
+                        android:textAlignment="center"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="2dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="2"
+                        android:background="@color/black" />
+
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/login_switch_btn"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="40dp"
-                    android:text="Don't have an account? Register" />
+                    android:paddingVertical="12dp"
+                    android:text="go to login" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
 
-
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="24dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
